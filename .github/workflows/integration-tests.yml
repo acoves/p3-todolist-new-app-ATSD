@@ -25,7 +25,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v1
+      - name: Fix permissions for Maven wrapper
+        run: chmod +x ./mvnw
+
       - name: Launch tests with Maven
-        run:  ./mvnw test -D spring.profiles.active=postgres
+        run: ./mvnw test -D spring.profiles.active=postgres
         env:
           POSTGRES_HOST: postgres
