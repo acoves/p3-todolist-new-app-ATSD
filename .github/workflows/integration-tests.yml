@@ -11,24 +11,24 @@ jobs:
       postgres:
         # Imagen Docker Hub
         image: postgres:13
+        ports: ['5432:5432']
         # Variables para arrancar PostgreSQL
         env:
           POSTGRES_USER: atsd
           POSTGRES_PASSWORD: atsd
-          POSTGRES_DB: atsd_test
+          POSTGRES_DB: atsd
         # Definimos chequeos para esperar hasta que postgres ya ha comenzado
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-
     steps:
       - uses: actions/checkout@v1
-      - name: Fix permissions for Maven wrapper
-        run: chmod +x ./mvnw
-
+      # Instalamos Maven en Alpine
+      - name: Install Maven
+        run: apk add --no-cache maven
       - name: Launch tests with Maven
-        run: ./mvnw test -D spring.profiles.active=postgres
+        run: mvn test -D spring.profiles.active=postgres
         env:
           POSTGRES_HOST: postgres
