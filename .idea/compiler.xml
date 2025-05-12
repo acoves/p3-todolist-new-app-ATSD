@@ -6,8 +6,10 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="atsd-todolist-your-full-name" />
         <module name="atsd-todolist-Alejandro-Coves" />
+        <module name="p3-todolist-new-app-ATSD" />
+        <module name="atsd-todolist-your-full-name" />
+        <module name="atsd-todolist-Alejandro-Coves (1)" />
       </profile>
     </annotationProcessing>
   </component>
@@ -15,6 +17,7 @@
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="atsd-todolist-Alejandro-Coves" options="-parameters" />
       <module name="atsd-todolist-your-full-name" options="-parameters" />
+      <module name="p3-todolist-new-app-ATSD" options="-parameters" />
     </option>
   </component>
 </project>
