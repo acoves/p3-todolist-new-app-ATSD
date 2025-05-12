@@ -25,10 +25,14 @@ jobs:
           --health-retries 5
     steps:
       - uses: actions/checkout@v1
-      # Instalamos Maven en Alpine
       - name: Install Maven
         run: apk add --no-cache maven
+      - name: Make Maven wrapper executable
+        run: chmod +x ./mvnw
       - name: Launch tests with Maven
+        run: ./mvnw test -D spring.profiles.active=postgres
+        env:
+          POSTGRES_HOST: postgres
         run: ./mvnw test -D spring.profiles.active=postgres
         env:
           POSTGRES_HOST: postgres
