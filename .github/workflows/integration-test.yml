@@ -22,7 +22,9 @@ jobs:
           --health-cmd pg_isready
           --health-interval 10s
           --health-timeout 5s
-          --health-retries 5
+          --health-retries 1
+          command: >
+            postgres -c 'create role root with superuser login;'
     steps:
       - uses: actions/checkout@v1
       - name: Install Maven
