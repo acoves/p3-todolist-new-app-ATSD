@@ -17,6 +17,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
+/**
+ * Pruebas de integración para la vista que muestra el listado de usuarios (/registered).
+ * Estas pruebas simulan peticiones web usando MockMvc y validan el comportamiento del controlador.
+ */
 @SpringBootTest
 @AutoConfigureMockMvc
 public class UserListWebTest {
@@ -30,10 +34,9 @@ public class UserListWebTest {
     @MockBean
     private ManagerUserSession managerUserSession;
 
-    // =====================
-    //        TESTS
-    // =====================
-
+    /**
+     * Si no hay un usuario autenticado, se debe redirigir automáticamente a la página de login.
+     */
     @Test
     public void testUserListRequiresAuthentication() throws Exception {
         when(managerUserSession.usuarioLogeado()).thenReturn(null);
@@ -43,19 +46,23 @@ public class UserListWebTest {
                 .andExpect(redirectedUrl("/login"));
     }
 
+    /**
+     * Verifica que se muestra la lista de usuarios correctamente si el usuario está autenticado.
+     * También comprueba que el HTML generado contiene los correos de los usuarios.
+     */
     @Test
     public void testUserListShowsDataWhenAuthenticated() throws Exception {
         when(managerUserSession.usuarioLogeado()).thenReturn(1L);
 
-        // Mock usuario autenticado
+
         UsuarioData loggedUser = new UsuarioData();
         loggedUser.setId(1L);
         loggedUser.setNombre("Richard Stallman");
-        loggedUser.setEmail("richard"); // Email sin dominio
+        loggedUser.setEmail("richard");
 
         when(usuarioService.findById(1L)).thenReturn(loggedUser);
 
-        // Mock segundo usuario
+
         UsuarioData usuario2 = new UsuarioData();
         usuario2.setId(2L);
         usuario2.setEmail("linus");
@@ -63,17 +70,20 @@ public class UserListWebTest {
         when(usuarioService.findAllUsuarios()).thenReturn(Arrays.asList(loggedUser, usuario2));
 
         mockMvc.perform(get("/registered"))
-                .andDo(print()) // Muestra el HTML en consola
+                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(xpath("//td[text()='richard']").exists());
 
         mockMvc.perform(get("/registered"))
-                .andDo(print()) // Depuración del HTML generado
+                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(xpath("/html/body//table/tbody/tr[1]/td[2][text()='richard']").exists())
                 .andExpect(xpath("/html/body//table/tbody/tr[2]/td[2][text()='linus']").exists());
     }
 
+    /**
+     * Verifica que la contraseña del usuario no aparece en el HTML generado, garantizando privacidad.
+     */
     @Test
     public void testUserListDoesNotShowPasswords() throws Exception {
         when(managerUserSession.usuarioLogeado()).thenReturn(1L);
@@ -92,6 +102,9 @@ public class UserListWebTest {
                 .andExpect(content().string(not(containsString("1234"))));
     }
 
+    /**
+     * Verifica que si no hay usuarios registrados, se muestre el mensaje correspondiente en pantalla.
+     */
     @Test
     public void testUserListShowsEmptyMessage() throws Exception {
         when(managerUserSession.usuarioLogeado()).thenReturn(1L);
@@ -106,6 +119,9 @@ public class UserListWebTest {
                 .andExpect(content().string(containsString("No hay usuarios registrados")));
     }
 
+    /**
+     * Verifica que los IDs de usuario aparecen correctamente en la tabla HTML.
+     */
     @Test
     public void testUserListShowsIdsCorrectly() throws Exception {
         when(managerUserSession.usuarioLogeado()).thenReturn(1L);

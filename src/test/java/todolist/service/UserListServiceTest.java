@@ -11,6 +11,10 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
+/**
+ * Tests unitarios que validan el comportamiento del servicio de obtención
+ * de usuarios registrados usando mocks.
+ */
 @SpringBootTest
 @Sql(scripts = "/clean-db.sql")
 public class UserListServiceTest {
@@ -20,7 +24,6 @@ public class UserListServiceTest {
 
     @Test
     public void testFindAllUsuariosReturnsAllUsers() {
-        // Mock: Lista de usuarios sin BD
         UsuarioData usuario1 = new UsuarioData();
         usuario1.setEmail("user1@umh.es");
 
@@ -29,32 +32,32 @@ public class UserListServiceTest {
 
         when(usuarioService.findAllUsuarios()).thenReturn(Arrays.asList(usuario1, usuario2));
 
+        // Llama al método y comprueba que devuelve dos elementos
         List<UsuarioData> usuarios = usuarioService.findAllUsuarios();
         assertThat(usuarios).hasSize(2);
     }
 
     @Test
     public void testFindAllUsuariosWithNoUsers() {
-        // Mock: Lista vacía
+        // Simula que no hay usuarios
         when(usuarioService.findAllUsuarios()).thenReturn(Collections.emptyList());
-
+        // Verifica que devuelve una lista vacía
         List<UsuarioData> usuarios = usuarioService.findAllUsuarios();
         assertThat(usuarios).isEmpty();
     }
 
     @Test
     public void testFindAllUsuariosConvertsToDTO() {
-        // Mock: Usuario sin password
         UsuarioData usuarioMock = new UsuarioData();
         usuarioMock.setId(1L);
         usuarioMock.setEmail("dto-test@umh.es");
 
         when(usuarioService.findAllUsuarios()).thenReturn(Collections.singletonList(usuarioMock));
-
+        // Verifica que los datos son correctos y que no incluye la contraseña
         List<UsuarioData> usuarios = usuarioService.findAllUsuarios();
         UsuarioData retrievedUser = usuarios.get(0);
 
-        assertThat(retrievedUser.getPassword()).isNull();
+        assertThat(retrievedUser.getPassword()).isNull(); // La contraseña no debe mostrarse
         assertThat(retrievedUser.getEmail()).isEqualTo("dto-test@umh.es");
     }
 }

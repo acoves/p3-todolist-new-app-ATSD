@@ -19,6 +19,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
 
+/**
+ * Test de la barra de navegación.
+ * Verifica que se muestren los enlaces correctos según el estado de autenticación del usuario.
+ */
 @SpringBootTest
 @AutoConfigureMockMvc
 public class NavbarTests {
@@ -35,7 +39,11 @@ public class NavbarTests {
     @MockBean
     private TareaService tareaService;
 
-    // ========== Tests ==========
+
+    /**
+     * Verifica que si el usuario está logueado, la barra de navegación
+     * contiene su nombre y un botón para cerrar sesión.
+     */
     @Test
     void navbarMuestraOpcionesUsuarioLogueado() throws Exception {
         Long userId = 1L;
@@ -46,6 +54,10 @@ public class NavbarTests {
                 .andExpect(content().string(containsString("Log out")));
     }
 
+    /**
+     * Si el usuario NO está logueado, en la página "About" deben aparecer
+     * enlaces a login y registro, en lugar del menú del usuario.
+     */
     @Test
     void navbarMuestraLoginYRegisterCuandoNoLogeado() throws Exception {
         when(sessionManager.usuarioLogeado()).thenReturn(null);
@@ -54,6 +66,11 @@ public class NavbarTests {
                 .andExpect(content().string(containsString("href=\"/registro\"")));
     }
 
+
+    /**
+     * Verifica que si el usuario está logueado, la barra de navegación
+     * muestra su nombre correctamente.
+     */
     @Test
     void navbarMuestraNombreUsuarioCorrectamente() throws Exception {
         Long userId = 1L;
@@ -61,6 +78,8 @@ public class NavbarTests {
         mockMvc.perform(get("/usuarios/1/tareas"))
                 .andExpect(content().string(containsString("Richard Stallman")));
     }
+
+
 
     @Test
     void menuDesplegableContieneOpcionLogout() throws Exception {
@@ -71,6 +90,9 @@ public class NavbarTests {
                 .andExpect(content().string(containsString("Log out")));
     }
 
+    /**
+     * Método auxiliar para configurar el estado simulado de un usuario logueado.
+     */
     @Test
     void navbarNoContieneEnlacesCriticosEnPaginasDeError() throws Exception {
         mockMvc.perform(get("/ruta-inexistente"))
@@ -78,16 +100,14 @@ public class NavbarTests {
                 .andExpect(content().string(not(containsString("href=\"/usuarios/1/tareas\""))));
     }
 
-    // ========== Métodos Helper ==========
     private void configurarMocksUsuarioLogueado(Long userId) {
         UsuarioData usuarioMock = new UsuarioData();
         usuarioMock.setId(userId);
         usuarioMock.setNombre("Richard Stallman");
         usuarioMock.setEmail("richard@umh.es");
 
-        // Mockear todas las dependencias críticas
         when(sessionManager.usuarioLogeado()).thenReturn(userId);
         when(usuarioService.findById(userId)).thenReturn(usuarioMock);
-        when(tareaService.allTareasUsuario(userId)).thenReturn(Collections.emptyList()); // Lista vacía de tareas
+        when(tareaService.allTareasUsuario(userId)).thenReturn(Collections.emptyList());
     }
 }
